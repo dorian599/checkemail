@@ -1,0 +1,61 @@
+#! /bin/sh
+# Script ejemplo para arranque de servicios en /etc/init.d/
+#
+# chkconfig: 345 99 01
+# description: checkEmail startup Script
+
+processid=`ps aux | grep server.py | grep python | awk '{print $2}'`
+
+case "$1" in
+start)
+echo "Iniciando servicio... "
+# Aquí comando a ejecutar para arrancar el servicio
+if [ -n "$processid" ]; then
+ echo "FAIL - El servicio esta corriendo en el proceso "$processid
+else
+ cd /opt/checkemail; python /opt/checkemail/server.py &
+ processid=`ps aux | grep server.py | grep python | awk '{print $2}'`
+ echo "Ok - El servicio iniciado correctamente en el proceso "$processid
+fi
+;;
+stop)
+echo "Deteniendo servicio..."
+# Aquí comando a ejecutar para detener el servicio
+if [ -n "$processid" ]; then
+   sudo kill -9 $processid
+   echo "OK - Proceso detenido exitosamente."
+else
+   echo "Fail - El servicio no iniciado, para iniciar utilice : /etc/init.d/checkEmail start"
+fi
+;;
+restart)
+echo "Reiniciando servicio..."
+# Aquí comando a ejecutar para detener el servicio
+if [ -n "$processid" ]; then
+   sudo kill -9 $processid
+   echo "OK - Proceso detenido exitosamente."
+   sleep 3
+   cd /opt/checkemail; python /opt/checkemail/server.py &
+   processid=`ps aux | grep server.py | grep python | awk '{print $2}'`
+   echo "Ok - El servicio iniciado correctamente en el proceso "$processid
+else
+   cd /opt/checkemail; python /opt/checkemail/server.py &
+   processid=`ps aux | grep server.py | grep python | awk '{print $2}'`
+   echo "Ok - El servicio iniciado correctamente en el proceso "$processid
+fi
+;;
+status)
+#echo "Estatus del servicio..."
+# Aquí comando a ejecutar para detener el servicio
+if [ -n "$processid" ]; then
+ echo "Ok - El servicio esta corriendo en el proceso "$processid
+else
+ echo "Fail - El servicio no esta iniciado, para iniciar utilice : /etc/init.d/checkemail start"
+fi
+;;
+*)
+echo "Modo de empleo: /etc/init.d/checkemail {start|stop|restart|status}"
+exit 1
+;;
+esac
+exit 0
